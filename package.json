@@ -1,8 +1,8 @@
 {
   "name": "com.unity.services.wire",
   "displayName": "Wire",
-  "version": "1.2.7",
-  "unity": "2020.3",
+  "version": "1.4.1",
+  "unity": "2021.3",
   "description": "Wire provides notifications in real-time for Unity Gaming Services subscribing to a particular service and listening for messages from that subscription through a websocket connection.",
   "dependencies": {
     "com.unity.services.core": "1.12.5",
@@ -21,19 +21,19 @@
       "Switch",
       "WebGL"
     ],
-    "changelog": "### Fixed\n\n- Token retrieval failures can no longer break Wire reconnection attempts\n- Websocket channel will report error when failing to retrieve token"
+    "changelog": "### Fixed\n\n- Fixed WebSocketInvalidStateException raised when disconnecting, closing an already opened socket\n- Fixed Wire occasionally using attempting to parse addresses as IPV6 on latfomrsm that do not support IPV6\n- Fixed error getting thrown when application returns from sleep due to unhandled server ping request. (Not applicable to WebGL.)"
   },
   "relatedPackages": {
-    "com.unity.services.wire.tests": "1.2.7"
+    "com.unity.services.wire.tests": "1.4.0"
   },
   "upmCi": {
-    "footprint": "c701598d6c4531fa9dfb7808a9b8cd7cb80a4394"
+    "footprint": "9a9140c2e31d8ad88bce822b38c9c8d64564fffa"
   },
-  "documentationUrl": "https://docs.unity3d.com/Packages/com.unity.services.wire@1.2/manual/index.html",
+  "documentationUrl": "https://docs.unity3d.com/Packages/com.unity.services.wire@1.4/manual/index.html",
   "repository": {
     "url": "https://github.cds.internal.unity3d.com/unity/operate-services-sdk.git",
     "type": "git",
-    "revision": "9cffdfabe0f434b75347351a78d6824effaf2774"
+    "revision": "b52cf66f16e79e8d96634389f2334b342668df40"
   },
-  "_fingerprint": "098672f918fac52d5936f43131548a06ea83b216"
+  "_fingerprint": "9a73acde80cc8accc41514726423c1891828e125"
 }

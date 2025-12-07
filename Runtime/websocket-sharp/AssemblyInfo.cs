@@ -9,3 +9,4 @@ using UnityEngine.Scripting;
 [assembly: AlwaysLinkAssembly]
 
 [assembly: InternalsVisibleTo("Unity.Services.Wire.Internal")]
+[assembly: InternalsVisibleTo("Unity.Services.Wire.Tests")]

@@ -1,4 +1,5 @@
 #region License
+
 /*
  * WebSocket.cs
  *
@@ -28,15 +29,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 #endregion
 
 #region Contributors
+
 /*
  * Contributors:
  * - Frank Razenberg <frank@zzattack.org>
  * - David Wood <dpwood@gmail.com>
  * - Liryna <liryna.stark@gmail.com>
  */
+
 #endregion
 
 using System;
@@ -70,58 +74,56 @@ namespace UnityWebSocketSharp
     /// </remarks>
     ///
     /// internalized for Unity
-
     class WebSocket : IDisposable
     {
         #region Private Fields
 
-        private AuthenticationChallenge        _authChallenge;
-        private string                         _base64Key;
-        private bool                           _client;
-        private Action                         _closeContext;
-        private CompressionMethod              _compression;
-        private WebSocketContext               _context;
-        private CookieCollection               _cookies;
-        private NetworkCredential              _credentials;
-        private bool                           _emitOnPing;
-        private bool                           _enableRedirection;
-        private string                         _extensions;
-        private bool                           _extensionsRequested;
-        private object                         _forMessageEventQueue;
-        private object                         _forPing;
-        private object                         _forSend;
-        private object                         _forState;
-        private MemoryStream                   _fragmentsBuffer;
-        private bool                           _fragmentsCompressed;
-        private Opcode                         _fragmentsOpcode;
-        private const string                   _guid = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+        private AuthenticationChallenge _authChallenge;
+        private string _base64Key;
+        private bool _client;
+        private Action _closeContext;
+        private CompressionMethod _compression;
+        private WebSocketContext _context;
+        private CookieCollection _cookies;
+        private NetworkCredential _credentials;
+        private bool _emitOnPing;
+        private bool _enableRedirection;
+        private string _extensions;
+        private bool _extensionsRequested;
+        private object _forMessageEventQueue;
+        private object _forPing;
+        private object _forSend;
+        private object _forState;
+        private MemoryStream _fragmentsBuffer;
+        private bool _fragmentsCompressed;
+        private Opcode _fragmentsOpcode;
+        private const string _guid = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
         private Func<WebSocketContext, string> _handshakeRequestChecker;
-        private bool                           _ignoreExtensions;
-        private bool                           _inContinuation;
-        private volatile bool                  _inMessage;
-        private volatile Logger                _log;
-        private static readonly int            _maxRetryCountForConnect;
-        private Action<MessageEventArgs>       _message;
-        private Queue<MessageEventArgs>        _messageEventQueue;
-        private uint                           _nonceCount;
-        private string                         _origin;
-        private ManualResetEvent               _pongReceived;
-        private bool                           _preAuth;
-        private string                         _protocol;
-        private string[]                       _protocols;
-        private bool                           _protocolsRequested;
-        private NetworkCredential              _proxyCredentials;
-        private Uri                            _proxyUri;
-        private volatile WebSocketState        _readyState;
-        private ManualResetEvent               _receivingExited;
-        private int                            _retryCountForConnect;
-        private bool                           _secure;
-        private ClientSslConfiguration         _sslConfig;
-        private Stream                         _stream;
-        private TcpClient                      _tcpClient;
-        private Uri                            _uri;
-        private const string                   _version = "13";
-        private TimeSpan                       _waitTime;
+        private bool _ignoreExtensions;
+        private bool _inContinuation;
+        private volatile bool _inMessage;
+        private volatile Logger _log;
+        private static readonly int _maxRetryCountForConnect;
+        private Action<MessageEventArgs> _message;
+        private Queue<MessageEventArgs> _messageEventQueue;
+        private uint _nonceCount;
+        private string _origin;
+        private ManualResetEvent _pongReceived;
+        private bool _preAuth;
+        private string _protocol;
+        private string[] _protocols;
+        private bool _protocolsRequested;
+        private NetworkCredential _proxyCredentials;
+        private Uri _proxyUri;
+        private volatile WebSocketState _readyState;
+        private ManualResetEvent _receivingExited;
+        private int _retryCountForConnect;
+        private bool _secure;
+        private ClientSslConfiguration _sslConfig;
+        private Stream _stream;
+        private Uri _uri;
+        private const string _version = "13";
+        private TimeSpan _waitTime;
 
         #endregion
 
@@ -260,20 +262,20 @@ namespace UnityWebSocketSharp
         public WebSocket(string url, params string[] protocols)
         {
             if (url == null)
-                throw new ArgumentNullException("url");
+                throw new ArgumentNullException(nameof(url));
 
             if (url.Length == 0)
-                throw new ArgumentException("An empty string.", "url");
+                throw new ArgumentException("An empty string.", nameof(url));
 
             string msg;
 
             if (!url.TryCreateWebSocketUri(out _uri, out msg))
-                throw new ArgumentException(msg, "url");
+                throw new ArgumentException(msg, nameof(url));
 
             if (protocols != null && protocols.Length > 0)
             {
                 if (!checkProtocols(protocols, out msg))
-                    throw new ArgumentException(msg, "protocols");
+                    throw new ArgumentException(msg, nameof(protocols));
 
                 _protocols = protocols;
             }
@@ -314,6 +316,8 @@ namespace UnityWebSocketSharp
                 _handshakeRequestChecker = value;
             }
         }
+
+        internal Func<string, int, Stream> GetNetworkStream { get; set; }
 
         // As server
         internal bool IgnoreExtensions
@@ -371,7 +375,8 @@ namespace UnityWebSocketSharp
                     throw new InvalidOperationException(msg);
                 }
 
-                lock (_forState) {
+                lock (_forState)
+                {
                     if (!canSet())
                         return;
 
@@ -397,7 +402,8 @@ namespace UnityWebSocketSharp
         {
             get
             {
-                lock (_cookies.SyncRoot) {
+                lock (_cookies.SyncRoot)
+                {
                     foreach (var cookie in _cookies)
                         yield return cookie;
                 }
@@ -487,7 +493,8 @@ namespace UnityWebSocketSharp
                     throw new InvalidOperationException(msg);
                 }
 
-                lock (_forState) {
+                lock (_forState)
+                {
                     if (!canSet())
                         return;
 
@@ -646,7 +653,8 @@ namespace UnityWebSocketSharp
                     }
                 }
 
-                lock (_forState) {
+                lock (_forState)
+                {
                     if (!canSet())
                         return;
 
@@ -802,7 +810,8 @@ namespace UnityWebSocketSharp
                     throw new ArgumentOutOfRangeException("value", msg);
                 }
 
-                lock (_forState) {
+                lock (_forState)
+                {
                     if (!canSet())
                         return;
 
@@ -858,7 +867,8 @@ namespace UnityWebSocketSharp
         // As server
         private bool accept()
         {
-            lock (_forState) {
+            lock (_forState)
+            {
                 if (_readyState == WebSocketState.Open)
                 {
                     _log.Trace("The connection has already been established.");
@@ -1302,7 +1312,8 @@ namespace UnityWebSocketSharp
 
         private void close(PayloadData payloadData, bool send, bool received)
         {
-            lock (_forState) {
+            lock (_forState)
+            {
                 if (_readyState == WebSocketState.Closing)
                 {
                     _log.Trace("The close process is already in progress.");
@@ -1429,7 +1440,8 @@ namespace UnityWebSocketSharp
                 return false;
             }
 
-            lock (_forState) {
+            lock (_forState)
+            {
                 if (_readyState == WebSocketState.Open)
                 {
                     _log.Trace("The connection has already been established.");
@@ -1616,7 +1628,8 @@ namespace UnityWebSocketSharp
 
         private MessageEventArgs dequeueFromMessageEventQueue()
         {
-            lock (_forMessageEventQueue) {
+            lock (_forMessageEventQueue)
+            {
                 return _messageEventQueue.Count > 0
                     ? _messageEventQueue.Dequeue()
                     : null;
@@ -1708,7 +1721,8 @@ namespace UnityWebSocketSharp
         {
             MessageEventArgs e = null;
 
-            lock (_forMessageEventQueue) {
+            lock (_forMessageEventQueue)
+            {
                 if (_inMessage)
                     return;
 
@@ -1742,7 +1756,8 @@ namespace UnityWebSocketSharp
                     error("An exception has occurred during an OnMessage event.", ex);
                 }
 
-                lock (_forMessageEventQueue) {
+                lock (_forMessageEventQueue)
+                {
                     if (_messageEventQueue.Count == 0)
                     {
                         _inMessage = false;
@@ -1777,7 +1792,8 @@ namespace UnityWebSocketSharp
                 error("An exception has occurred during an OnMessage event.", ex);
             }
 
-            lock (_forMessageEventQueue) {
+            lock (_forMessageEventQueue)
+            {
                 if (_messageEventQueue.Count == 0)
                 {
                     _inMessage = false;
@@ -1818,7 +1834,8 @@ namespace UnityWebSocketSharp
 
             MessageEventArgs e = null;
 
-            lock (_forMessageEventQueue) {
+            lock (_forMessageEventQueue)
+            {
                 if (_messageEventQueue.Count == 0)
                 {
                     _inMessage = false;
@@ -1849,7 +1866,8 @@ namespace UnityWebSocketSharp
             if (received == null)
                 return false;
 
-            lock (_forPing) {
+            lock (_forPing)
+            {
                 try
                 {
                     received.Reset();
@@ -1933,7 +1951,8 @@ namespace UnityWebSocketSharp
 
             var pong = WebSocketFrame.CreatePongFrame(frame.PayloadData, _client);
 
-            lock (_forState) {
+            lock (_forState)
+            {
                 if (_readyState != WebSocketState.Open)
                 {
                     _log.Trace("A pong to this ping cannot be sent.");
@@ -2086,13 +2105,6 @@ namespace UnityWebSocketSharp
 
                 _stream = null;
             }
-
-            if (_tcpClient != null)
-            {
-                _tcpClient.Close();
-
-                _tcpClient = null;
-            }
         }
 
         private void releaseCommonResources()
@@ -2146,7 +2158,8 @@ namespace UnityWebSocketSharp
 
         private bool send(byte[] rawFrame)
         {
-            lock (_forState) {
+            lock (_forState)
+            {
                 if (_readyState != WebSocketState.Open)
                 {
                     _log.Error("The current state of the interface is not Open.");
@@ -2160,7 +2173,8 @@ namespace UnityWebSocketSharp
 
         private bool send(Opcode opcode, Stream sourceStream)
         {
-            lock (_forSend) {
+            lock (_forSend)
+            {
                 var dataStream = sourceStream;
                 var compressed = false;
                 var sent = false;
@@ -2278,7 +2292,8 @@ namespace UnityWebSocketSharp
             sender.BeginInvoke(
                 opcode,
                 sourceStream,
-                ar => {
+                ar =>
+                {
                     try
                     {
                         var sent = sender.EndInvoke(ar);
@@ -2445,8 +2460,7 @@ namespace UnityWebSocketSharp
                 {
                     releaseClientResources();
 
-                    _tcpClient = new TcpClient(_proxyUri.DnsSafeHost, _proxyUri.Port);
-                    _stream = _tcpClient.GetStream();
+                    _stream = GetNetworkStream?.Invoke(_proxyUri.DnsSafeHost, _proxyUri.Port);
                 }
 
                 timeout = 15000;
@@ -2461,8 +2475,7 @@ namespace UnityWebSocketSharp
         {
             if (_proxyUri != null)
             {
-                _tcpClient = new TcpClient(_proxyUri.DnsSafeHost, _proxyUri.Port);
-                _stream = _tcpClient.GetStream();
+                _stream = GetNetworkStream(_proxyUri.DnsSafeHost, _proxyUri.Port);
 
                 var res = sendProxyConnectRequest();
 
@@ -2473,8 +2486,15 @@ namespace UnityWebSocketSharp
             }
             else
             {
-                _tcpClient = new TcpClient(_uri.DnsSafeHost, _uri.Port);
-                _stream = _tcpClient.GetStream();
+                try
+                {
+                    _stream = GetNetworkStream(_uri.DnsSafeHost, _uri.Port);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    throw;
+                }
             }
 
             if (_secure)
@@ -2532,7 +2552,8 @@ namespace UnityWebSocketSharp
                     WebSocketFrame.ReadFrameAsync(
                         _stream,
                         false,
-                        frame => {
+                        frame =>
+                        {
                             var cont = processReceivedFrame(frame)
                                 && _readyState != WebSocketState.Closed;
 
@@ -2553,7 +2574,8 @@ namespace UnityWebSocketSharp
 
                             message();
                         },
-                        ex => {
+                        ex =>
+                        {
                             _log.Fatal(ex.Message);
                             _log.Debug(ex.ToString());
 
@@ -2593,7 +2615,8 @@ namespace UnityWebSocketSharp
 
                     var name = _compression.ToExtensionString();
                     var invalid = ext.SplitHeaderValue(';').Contains(
-                        t => {
+                        t =>
+                        {
                             t = t.Trim();
 
                             var valid = t == name
@@ -2639,7 +2662,8 @@ namespace UnityWebSocketSharp
             Func<bool> acceptor = accept;
 
             acceptor.BeginInvoke(
-                ar => {
+                ar =>
+                {
                     var accepted = acceptor.EndInvoke(ar);
 
                     if (!accepted)
@@ -2654,7 +2678,8 @@ namespace UnityWebSocketSharp
         // As server
         internal void Close(PayloadData payloadData, byte[] rawFrame)
         {
-            lock (_forState) {
+            lock (_forState)
+            {
                 if (_readyState == WebSocketState.Closing)
                 {
                     _log.Trace("The close process is already in progress.");
@@ -2742,7 +2767,8 @@ namespace UnityWebSocketSharp
             if (received == null)
                 return false;
 
-            lock (_forPing) {
+            lock (_forPing)
+            {
                 try
                 {
                     received.Reset();
@@ -2766,7 +2792,8 @@ namespace UnityWebSocketSharp
             Opcode opcode, byte[] data, Dictionary<CompressionMethod, byte[]> cache
         )
         {
-            lock (_forSend) {
+            lock (_forSend)
+            {
                 byte[] found;
 
                 if (!cache.TryGetValue(_compression, out found))
@@ -2794,7 +2821,8 @@ namespace UnityWebSocketSharp
             Dictionary<CompressionMethod, Stream> cache
         )
         {
-            lock (_forSend) {
+            lock (_forSend)
+            {
                 Stream found;
 
                 if (!cache.TryGetValue(_compression, out found))
@@ -3533,7 +3561,8 @@ namespace UnityWebSocketSharp
             Func<bool> connector = connect;
 
             connector.BeginInvoke(
-                ar => {
+                ar =>
+                {
                     var connected = connector.EndInvoke(ar);
 
                     if (!connected)
@@ -4121,7 +4150,8 @@ namespace UnityWebSocketSharp
             if (cookie == null)
                 throw new ArgumentNullException("cookie");
 
-            lock (_forState) {
+            lock (_forState)
+            {
                 if (!canSet())
                     return;
 
@@ -4204,7 +4234,8 @@ namespace UnityWebSocketSharp
                 }
             }
 
-            lock (_forState) {
+            lock (_forState)
+            {
                 if (!canSet())
                     return;
 
@@ -4351,7 +4382,8 @@ namespace UnityWebSocketSharp
                 }
             }
 
-            lock (_forState) {
+            lock (_forState)
+            {
                 if (!canSet())
                     return;
 

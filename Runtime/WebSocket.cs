@@ -8,6 +8,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using UnityEngine;
 using AOT;
@@ -139,31 +141,75 @@ namespace Unity.Services.Wire.Internal
             }
         }
 
-        /*
-         * Return error message based on int code
-         *
-
-         */
         /// <summary>
-        /// Return an exception instance based on int code.
-        ///
-        /// Used for resolving JSLIB errors to meaninfull messages.
+        /// Represents possible WebSocket error codes returned by native
+        /// implementations.
+        /// </summary>
+        public enum WebSocketErrorCode
+        {
+            /// <summary>
+            /// WebSocket instance not found.
+            /// </summary>
+            InstanceNotFound = -1,
+
+            /// <summary>
+            /// WebSocket is already connected or in connecting state.
+            /// </summary>
+            AlreadyConnecting = -2,
+
+            /// <summary>
+            /// WebSocket is not connected.
+            /// </summary>
+            NotConnected = -3,
+
+            /// <summary>
+            /// WebSocket is already closing.
+            /// </summary>
+            AlreadyClosing = -4,
+
+            /// <summary>
+            /// WebSocket is already closed.
+            /// </summary>
+            AlreadyClosed = -5,
+
+            /// <summary>
+            /// WebSocket is not in open state.
+            /// </summary>
+            NotOpen = -6,
+
+            /// <summary>
+            /// Cannot close WebSocket. An invalid code was specified or reason is too long.
+            /// </summary>
+            InvalidCloseParameters = -7
+        }
+
+        /// <summary>
+        /// Returns an exception instance based on int code.
+        /// Used for resolving JSLIB errors to meaningful messages.
         /// </summary>
         /// <returns>Instance of an exception.</returns>
         /// <param name="errorCode">Error code.</param>
         /// <param name="inner">Inner exception</param>
-        public static WebSocketException GetErrorMessageFromCode(int errorCode, Exception inner)
+        public static WebSocketException GetErrorMessageFromCode(WebSocketErrorCode errorCode, Exception inner)
         {
             switch (errorCode)
             {
-                case -1: return new WebSocketUnexpectedException("WebSocket instance not found.", inner);
-                case -2: return new WebSocketInvalidStateException("WebSocket is already connected or in connecting state.", inner);
-                case -3: return new WebSocketInvalidStateException("WebSocket is not connected.", inner);
-                case -4: return new WebSocketInvalidStateException("WebSocket is already closing.", inner);
-                case -5: return new WebSocketInvalidStateException("WebSocket is already closed.", inner);
-                case -6: return new WebSocketInvalidStateException("WebSocket is not in open state.", inner);
-                case -7: return new WebSocketInvalidArgumentException("Cannot close WebSocket. An invalid code was specified or reason is too long.", inner);
-                default: return new WebSocketUnexpectedException("Unknown error.", inner);
+                case WebSocketErrorCode.InstanceNotFound:
+                    return new WebSocketUnexpectedException("WebSocket instance not found.", inner);
+                case WebSocketErrorCode.AlreadyConnecting:
+                    return new WebSocketInvalidStateException("WebSocket is already connected or in connecting state.", inner);
+                case WebSocketErrorCode.NotConnected:
+                    return new WebSocketInvalidStateException("WebSocket is not connected.", inner);
+                case WebSocketErrorCode.AlreadyClosing:
+                    return new WebSocketInvalidStateException("WebSocket is already closing.", inner);
+                case WebSocketErrorCode.AlreadyClosed:
+                    return new WebSocketInvalidStateException("WebSocket is already closed.", inner);
+                case WebSocketErrorCode.NotOpen:
+                    return new WebSocketInvalidStateException("WebSocket is not in open state.", inner);
+                case WebSocketErrorCode.InvalidCloseParameters:
+                    return new WebSocketInvalidArgumentException("Cannot close WebSocket. An invalid code was specified or reason is too long.", inner);
+                default:
+                    return new WebSocketUnexpectedException("Unknown error.", inner);
             }
         }
     }
@@ -174,21 +220,15 @@ namespace Unity.Services.Wire.Internal
     public class WebSocketException : Exception
     {
         /// <inheritdoc cref="WebSocketException"/>
-        public WebSocketException()
-        {
-        }
+        public WebSocketException() {}
 
         /// <inheritdoc cref="WebSocketException"/>
         public WebSocketException(string message)
-            : base(message)
-        {
-        }
+            : base(message) {}
 
         /// <inheritdoc cref="WebSocketException"/>
         public WebSocketException(string message, Exception inner)
-            : base(message, inner)
-        {
-        }
+            : base(message, inner) {}
     }
 
     /// <summary>
@@ -197,8 +237,12 @@ namespace Unity.Services.Wire.Internal
     class WebSocketUnexpectedException : WebSocketException
     {
         public WebSocketUnexpectedException() {}
-        public WebSocketUnexpectedException(string message) : base(message) {}
-        public WebSocketUnexpectedException(string message, Exception inner) : base(message, inner) {}
+
+        public WebSocketUnexpectedException(string message)
+            : base(message) {}
+
+        public WebSocketUnexpectedException(string message, Exception inner)
+            : base(message, inner) {}
     }
 
     /// <summary>
@@ -207,8 +251,12 @@ namespace Unity.Services.Wire.Internal
     class WebSocketInvalidArgumentException : WebSocketException
     {
         public WebSocketInvalidArgumentException() {}
-        public WebSocketInvalidArgumentException(string message) : base(message) {}
-        public WebSocketInvalidArgumentException(string message, Exception inner) : base(message, inner) {}
+
+        public WebSocketInvalidArgumentException(string message)
+            : base(message) {}
+
+        public WebSocketInvalidArgumentException(string message, Exception inner)
+            : base(message, inner) {}
     }
 
     /// <summary>
@@ -217,8 +265,12 @@ namespace Unity.Services.Wire.Internal
     class WebSocketInvalidStateException : WebSocketException
     {
         public WebSocketInvalidStateException() {}
-        public WebSocketInvalidStateException(string message) : base(message) {}
-        public WebSocketInvalidStateException(string message, Exception inner) : base(message, inner) {}
+
+        public WebSocketInvalidStateException(string message)
+            : base(message) {}
+
+        public WebSocketInvalidStateException(string message, Exception inner)
+            : base(message, inner) {}
     }
 
 #if UNITY_WEBGL && !UNITY_EDITOR
@@ -301,7 +353,7 @@ namespace Unity.Services.Wire.Internal
             int ret = WebSocketConnect(this.instanceId);
 
             if (ret < 0)
-                throw WebSocketHelpers.GetErrorMessageFromCode(ret, null);
+                throw WebSocketHelpers.GetErrorMessageFromCode((WebSocketHelpers.WebSocketErrorCode)ret, null);
         }
 
         /// <summary>
@@ -314,7 +366,7 @@ namespace Unity.Services.Wire.Internal
             int ret = WebSocketClose(this.instanceId, (int)code, reason);
 
             if (ret < 0)
-                throw WebSocketHelpers.GetErrorMessageFromCode(ret, null);
+                throw WebSocketHelpers.GetErrorMessageFromCode((WebSocketHelpers.WebSocketErrorCode)ret, null);
         }
 
         /// <summary>
@@ -326,7 +378,7 @@ namespace Unity.Services.Wire.Internal
             int ret = WebSocketSend(this.instanceId, data, data.Length);
 
             if (ret < 0)
-                throw WebSocketHelpers.GetErrorMessageFromCode(ret, null);
+                throw WebSocketHelpers.GetErrorMessageFromCode((WebSocketHelpers.WebSocketErrorCode)ret, null);
         }
 
         /// <summary>
@@ -338,7 +390,7 @@ namespace Unity.Services.Wire.Internal
             int state = WebSocketGetState(this.instanceId);
 
             if (state < 0)
-                throw WebSocketHelpers.GetErrorMessageFromCode(state, null);
+                throw WebSocketHelpers.GetErrorMessageFromCode((WebSocketHelpers.WebSocketErrorCode)state, null);
 
             switch (state)
             {
@@ -401,6 +453,8 @@ namespace Unity.Services.Wire.Internal
 #else
     class WebSocket : IWebSocket
     {
+        TcpClient _tcpClient = default;
+
         /// <summary>
         /// Occurs when the connection is opened.
         /// </summary>
@@ -435,7 +489,7 @@ namespace Unity.Services.Wire.Internal
             try
             {
                 // Create WebSocket instance
-                this.ws = new UnityWebSocketSharp.WebSocket(url);
+                this.ws = new UnityWebSocketSharp.WebSocket(url) { GetNetworkStream = GetStream };
 
                 // Bind OnOpen event
                 this.ws.OnOpen += (sender, ev) =>
@@ -459,6 +513,9 @@ namespace Unity.Services.Wire.Internal
                 // Bind OnClose event
                 this.ws.OnClose += (sender, ev) =>
                 {
+                    _tcpClient?.Dispose();
+                    _tcpClient = null;
+
                     this.OnClose?.Invoke(
                         WebSocketHelpers.ParseCloseCodeEnum((int)ev.Code)
                     );
@@ -486,6 +543,7 @@ namespace Unity.Services.Wire.Internal
                 {
                     ws.SslConfiguration.EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12;
                 }
+
                 this.ws.ConnectAsync();
             }
             catch (Exception e)
@@ -561,6 +619,37 @@ namespace Unity.Services.Wire.Internal
                 default:
                     return WebSocketState.Closed;
             }
+        }
+
+        private NetworkStream GetStream(string url, int port)
+        {
+            Logger.Log($"Creating TCP Client, url to connect to: {url}");
+
+#if UNITY_SWITCH || UNITY_PS4 || UNITY_PS5
+
+            // enforce IPV4 on the platforms that do not support IPV6
+            var ipAddressesAssociatedWithUrl = Dns.GetHostAddresses(url);
+            foreach (var ipAddress in ipAddressesAssociatedWithUrl)
+            {
+                if (ipAddress.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    _tcpClient = new TcpClient(AddressFamily.InterNetwork);
+                    Logger.Log($"TCP Client connection initiated on : {ipAddress}");
+                    _tcpClient.Connect(ipAddress, port);
+                    break;
+                }
+            }
+#else
+            _tcpClient = new TcpClient(url, port);
+#endif
+            if (_tcpClient == null)
+            {
+                throw new Exception($"Could not create a network stream because the construction of the required {nameof(TcpClient)} failed!\r\n" +
+                    "Please ensure that the platform that you are running the application on supports the System.Net.Sockets library!");
+            }
+
+            Logger.Log("TCP Client specified address family:" + _tcpClient.Client.AddressFamily);
+            return _tcpClient.GetStream();
         }
     }
 #endif

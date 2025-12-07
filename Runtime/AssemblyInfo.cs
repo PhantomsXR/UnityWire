@@ -5,6 +5,7 @@ using UnityEngine.Scripting;
 // prevent Il2CPP code stripping
 [assembly: AlwaysLinkAssembly]
 
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")] // Namespace in Moq
 [assembly: InternalsVisibleTo("Unity.Services.Friends.IntegrationTests")]
 [assembly: InternalsVisibleTo("Unity.Services.Lobby.IntegrationTests")]
 [assembly: InternalsVisibleTo("Unity.Services.Multiplayer.IntegrationTests")]

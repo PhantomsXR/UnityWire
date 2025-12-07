@@ -4,12 +4,38 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2025-06-09
+
+### Fixed
+
+- Fixed WebSocketInvalidStateException raised when disconnecting, closing an already opened socket
+- Fixed Wire occasionally using attempting to parse addresses as IPV6 on latfomrsm that do not support IPV6
+- Fixed error getting thrown when application returns from sleep due to unhandled server ping request. (Not applicable to WebGL.)
+
+## [1.3.0] - 2025-02-12
+
+### Fixed
+
+- Updated dyncall syntax
+- Websocket jslib will no longer crash player loop on successive connections/disconnections
+- Updated reconnection logic to check if internet is reachable, avoiding unnecessary connection attempts
+
+## [1.2.8] - 2025-01-15
+
+### Fixed
+
+- Updated package docs to reflect the removal of `WIRE_EXCLUDE_WEBSOCKETSHARP` in v1.2.2
+
+### Changed
+
+- Updated the minimum supported Editor version to 2021.3.
+
 ## [1.2.7] - 2024-08-27
 
 ### Fixed
 
-- Token retrieval failures can no longer break Wire reconnection attempts
-- Websocket channel will report error when failing to retrieve token
+- Token retrieval failures can no longer break Wire reconnection attempts.
+- Websocket channel will report error when failing to retrieve token.
 
 ## [1.2.6] - 2024-07-11
 
@@ -26,9 +52,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [1.2.3] - 2024-03-20
 
-### Changed 
+### Changed
 
-- Updated unity core to 1.12.4 
+- Updated unity core to 1.12.4
 
 ### Added
 
@@ -36,14 +62,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [1.2.2] - 2023-09-21
 ### Fixed
-* the unity-websocket-sharp is no longer disabled by the define `WIRE_EXCLUDE_WEBSOCKETSHARP`
-* fixed a bug that would make UnsubscribeAsync throw an exception when called on a disabled Wire connection.
+* The unity-websocket-sharp is no longer disabled by the define `WIRE_EXCLUDE_WEBSOCKETSHARP`
+* Fixed a bug that would make UnsubscribeAsync throw an exception when called on a disabled Wire connection.
 
 ## [1.2.0] - 2023-06-02
 ### Fixed
-* fixed a bug in the ping protocol
-* fixed an issue preventing the package to work with Nintendo Switch
-* fixed vulnerabilities in the Websocket library
+* Fixed a bug in the ping protocol
+* Fixed an issue preventing the package to work with Nintendo Switch
+* Fixed vulnerabilities in the Websocket library
 ### Changed
 * Excluded WebGL and Switch platforms from the websocket-sharp target
 
